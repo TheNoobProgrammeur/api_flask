@@ -38,10 +38,13 @@ class Register(Resource):
             db.session.add(user)
             db.session.commit()
 
-            return {"response": "SUCCESS", "message": "Your is resisted."}
+            rep = token_service.encode_auth_token(user.id)
+            session['api_sessions_token'] = rep
+
+            return {"response": "SUCCESS", "message": "Your is resisted"}
 
 
-login_definition = api.model('User Informations for Register', {
+login_definition = api.model('User Informations for Login', {
     'username': fields.String(required=True),
     'password': fields.String(required=True)
 })
