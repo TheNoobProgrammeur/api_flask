@@ -11,4 +11,4 @@ class Evenement(db.Model):
     titer = db.Column(db.String())
     date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     createur = db.Column(db.Integer, db.ForeignKey('user.id'))
-    inscrits = relationship("Users", secondary=inscription_list, back_populates="evenements")
+    inscrits = relationship("User", secondary=inscription_list, back_populates="evenements")
