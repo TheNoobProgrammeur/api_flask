@@ -5,7 +5,7 @@
 
 Cette Api me permet de travailler mon python.
 
-Elle évoluera aux files de mes envies .... pour s'en doute aller nulle part.
+Elle évoluera aux files de mes envies .... pour sans doute aller nulle part.
 
 ## Heroku :
 
