@@ -1,30 +1,147 @@
-version: 2.1
-
-orbs:
-  python: circleci/python@0.2.1
-
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
 jobs:
   build:
-    executor: python/default
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/python:3.6.4
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
-  test:
-    executor: python/default
-    steps:
-      - checkout
-      - python/load-cache
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v7-dependencies-{{ checksum "requirements.txt" }}
+            - v7-dependencies-
+            # fallback to using the latest cache if no exact match is found
+
       - run:
-          command: pytest
-          name: Test
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+
+          environment:
+            CONDUIT_SECRET: 'something-really-secret'
+            FLASK_APP: /home/circleci/repo/run.py
+            FLASK_DEBUG: 1
+
+      - save_cache:
+          paths:
+            - venv
+          key: v7-dependencies-{{ checksum "requirements.txt" }}
+
+
+
+  test:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/python:3.6.4
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      - image: postgres:9.6.2-alpine
+        environment:
+          POSTGRES_USER: myUsr  
+          POSTGRES_PASSOWRD: somePwd 
+          POSTGRES_DB: myUsr
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v7-dependencies-{{ checksum "requirements.txt" }}
+            - v7-dependencies-
+            # fallback to using the latest cache if no exact match is found
+    
+      - run:
+          name: bd upgrade 
+          command: |
+            . venv/bin/activate
+            sleep 1
+            flask db upgrade
+          environment:
+            CONDUIT_SECRET: 'something-really-secret'
+            FLASK_APP: /home/circleci/repo/run.py
+            DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/myUsr
+            FLASK_DEBUG: 1
+
+
+      
+
+      # run tests!
+      # this example uses Django's built-in test-runner
+      # other common Python testing frameworks include pytest and nose
+      # https://pytest.org
+      # https://nose.readthedocs.io
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            pytest
+          environment:
+            CONDUIT_SECRET: 'something-really-secret'
+            FLASK_APP: /home/circleci/repo/run.py
+            FLASK_DEBUG: 1
+            DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/myUsr
+
+      - save_cache:
+          paths:
+            - venv
+          key: v7-dependencies-{{ checksum "requirements.txt" }}
+
+  back-deploy-heroku:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      
+      - run:
+          name: Heroku Deploy
+          command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+
+      - run:
+          name: Smoke Test
+          command: |
+            HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/`
+            if [ "$HTTPCODE" -ne 200 ]; then
+              echo "heroku app not responding, failing deploy"
+              exit 1
+            fi
+
+
 
 
 workflows:
-  main:
+  version: 2
+  build-test-and-deploy:
     jobs:
       - build
       - test:
           requires:
             - build
+      - back-deploy-heroku:
+          requires :
+            - test
+          filters:
+            branches:
+              only:
+                - master
