@@ -3,7 +3,9 @@
 
 # Projet API Flask
 
-Cette Api me permetde travailler mon python.
+Cette Api me permet de travailler mon python.
+
+Elle évoluera aux files de mes envies .... pour s'en doute aller nulle part.
 
 ## Heroku :
 
