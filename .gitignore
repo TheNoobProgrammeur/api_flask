@@ -156,7 +156,6 @@ dmypy.json
 # Unit test / coverage reports
 
 # Translations
-migrations
 
 # Django stuff:
 
