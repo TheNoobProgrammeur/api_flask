@@ -15,4 +15,4 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 
 from app.resource import pong, user
-from app.model import user
+from app.model import user, evenement
