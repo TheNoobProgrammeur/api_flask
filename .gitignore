@@ -206,3 +206,5 @@ dmypy.json
 
 
 report.html
+
+test-results/
