@@ -90,12 +90,18 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest
+            pytest --junitxml=test-results/junit.xml
           environment:
             CONDUIT_SECRET: 'something-really-secret'
             FLASK_APP: /home/circleci/repo/run.py
             FLASK_DEBUG: 1
             DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/myUsr
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
 
       - save_cache:
           paths:
