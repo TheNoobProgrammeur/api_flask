@@ -1,7 +1,6 @@
 import hashlib
 
 from flask import request, session
-from flask_login import current_user, login_required, logout_user
 from flask_restplus import Resource, fields
 
 from app import api
