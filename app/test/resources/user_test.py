@@ -90,5 +90,5 @@ def test_delete(setup_app):
     setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
                                  data=payload)
 
-    response = setup_app["client_test"].delete('/user/')
+    response = setup_app["client_test"].delete('/user')
     assert 200 == response.status_code

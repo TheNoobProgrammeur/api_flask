@@ -1,5 +1,4 @@
 import hashlib
-from datetime import datetime
 
 from flask import request, session
 from flask_restplus import Resource, fields
@@ -74,7 +73,7 @@ class Login(Resource):
             return {"response": "SUCCESS", "message": "Your is identified"}
 
 
-@ns_user.route("/")
+@ns_user.route("")
 class Delete(Resource):
     @require_api_token
     def delete(self):

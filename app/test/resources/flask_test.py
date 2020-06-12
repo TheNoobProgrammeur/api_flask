@@ -30,7 +30,7 @@ def gestion_user(setup_app):
                              data=payload)
     yield
 
-    setup_app["client_test"].delete('/user/')
+    setup_app["client_test"].delete('/user')
 
 
 def test_smoke(setup_app, gestion_user):
