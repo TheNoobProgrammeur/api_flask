@@ -1,10 +1,12 @@
 import hashlib
+from datetime import datetime
 
 from flask import request, session
 from flask_restplus import Resource, fields
 
 from app import api
 from app import db
+from app.model.evenement import Evenement
 from app.model.user import User
 from app.service import token as token_service
 from app.service.token import require_api_token
@@ -76,14 +78,50 @@ class Login(Resource):
 class Delete(Resource):
     @require_api_token
     def delete(self):
-        token = session['api_sessions_token']
-
-        id = token_service.get_id_by_token(token)
-        user = User.query.filter_by(id=id).first()
-
+        user = token_service.get_user_by_token()
         db.session.delete(user)
         db.session.commit()
-
         del session['api_sessions_token']
-
         return {"response": "SUCCESS", "message": "Goodbye."}
+
+
+Evenement_definition = api.model('Evenements Informations for creation', {
+    'titre': fields.String(required=True),
+    'date': fields.DateTime(required=True),
+    'description': fields.String
+})
+
+
+@ns_user.route("/evenement")
+class GestionEvenement(Resource):
+    @require_api_token
+    def get(self):
+        user = token_service.get_user_by_token()
+
+        evenements = user.evenements_cree
+
+        res = {}
+        for event in evenements:
+            res[event.id] = {"id": event.id , "titre": event.titre, "description": event.description, "date": str(event.date),
+                             "autheur": event.author.username}
+
+        return {"response": "SUCCESS", "message": "Liste des evenement.", "evenements": res}
+
+    @require_api_token
+    @api.expect(Evenement_definition)
+    def post(self):
+        data = request.get_json()
+
+        user = token_service.get_user_by_token()
+
+        evenement = Evenement(author=user)
+        evenement.titre = data["titre"]
+        evt_date = data["date"]
+        evenement.date = evt_date
+        evenement.description = data["description"]
+
+        db.session.add(evenement)
+        db.session.commit()
+
+        return {"response": "SUCCESS", "message": "Evenement is created"}
+

@@ -12,7 +12,6 @@ api = Api(app=app, version='0.1', title='My API', description='', validate=True)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-login = LoginManager(app)
 
-from app.resource import pong, user
+from app.resource import pong, user, evenement
 from app.model import user, evenement
