@@ -84,10 +84,14 @@ class Delete(Resource):
         return {"response": "SUCCESS", "message": "Goodbye."}
 
 
-Evenement_definition = api.model('Evenements Informations for creation', {
+evenement_definition = api.model('Evenements Informations for creation', {
     'titre': fields.String(required=True),
     'date': fields.DateTime(required=True),
     'description': fields.String
+})
+
+body_delete_event = api.model('Param for delete Evenement', {
+    'id_event': fields.Integer(required=True)
 })
 
 
@@ -100,14 +104,17 @@ class GestionEvenement(Resource):
         evenements = user.evenements_cree
 
         res = {}
+        indice = 0
         for event in evenements:
-            res[event.id] = {"id": event.id , "titre": event.titre, "description": event.description, "date": str(event.date),
-                             "autheur": event.author.username}
+            res[indice] = {"id": event.id, "titre": event.titre, "description": event.description,
+                           "date": str(event.date),
+                           "autheur": event.author.username}
+            indice += 1
 
         return {"response": "SUCCESS", "message": "Liste des evenement.", "evenements": res}
 
     @require_api_token
-    @api.expect(Evenement_definition)
+    @api.expect(evenement_definition)
     def post(self):
         data = request.get_json()
 
@@ -124,3 +131,18 @@ class GestionEvenement(Resource):
 
         return {"response": "SUCCESS", "message": "Evenement is created"}
 
+    @require_api_token
+    @api.expect(body_delete_event)
+    def delete(self):
+        data = request.get_json()
+
+        id_event = data["id_event"]
+
+        user = token_service.get_user_by_token()
+
+        evenement = user.evenements_cree.filter_by(id=id_event).first()
+
+        db.session.delete(evenement)
+        db.session.commit()
+
+        return {"response": "SUCCESS", "message": "Evenement is delete"}
