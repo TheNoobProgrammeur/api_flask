@@ -1,4 +1,4 @@
-from flask_restplus import Resource
+from flask_restplus import Resource, fields
 
 from app import api, db
 from app.model.evenement import Evenement
@@ -21,6 +21,7 @@ class Evenements(Resource):
 
 
 @ns_evenement.route("/<int:id_evenement>")
+@ns_evenement.param('id_evenement', 'The evenement ID')
 class GestionEvenement(Resource):
     def get(self, id_evenement):
         event: Evenement = Evenement.query.get(id_evenement)

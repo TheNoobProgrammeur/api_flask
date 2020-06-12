@@ -13,9 +13,25 @@ from app.service.token import require_api_token
 ns_user = api.namespace('user', description="user operations")
 
 register_definition = api.model('User Informations for Register', {
-    'username': fields.String(required=True),
-    'email': fields.String(required=True),
-    'password': fields.String(required=True)
+    'username': fields.String(required=True, description="Username"),
+    'email': fields.String(required=True, description="User email"),
+    'password': fields.String(required=True, description="User password")
+})
+
+
+login_definition = api.model('User Informations for Login', {
+    'username': fields.String(required=True, description="Username"),
+    'password': fields.String(required=True, description="User password")
+})
+
+evenement_definition = api.model('Evenements Informations for creation', {
+    'titre': fields.String(required=True, description="Titre for new event"),
+    'date': fields.DateTime(required=True, description="Event day"),
+    'description': fields.String
+})
+
+body_delete_event = api.model('Param for delete Evenement', {
+    'id_event': fields.Integer(required=True, description="Event id for delete")
 })
 
 
@@ -43,12 +59,6 @@ class Register(Resource):
             session['api_sessions_token'] = rep
 
             return {"response": "SUCCESS", "message": "Your is resisted"}
-
-
-login_definition = api.model('User Informations for Login', {
-    'username': fields.String(required=True),
-    'password': fields.String(required=True)
-})
 
 
 @ns_user.route("/login")
@@ -82,17 +92,6 @@ class Delete(Resource):
         db.session.commit()
         del session['api_sessions_token']
         return {"response": "SUCCESS", "message": "Goodbye."}
-
-
-evenement_definition = api.model('Evenements Informations for creation', {
-    'titre': fields.String(required=True),
-    'date': fields.DateTime(required=True),
-    'description': fields.String
-})
-
-body_delete_event = api.model('Param for delete Evenement', {
-    'id_event': fields.Integer(required=True)
-})
 
 
 @ns_user.route("/evenement")
