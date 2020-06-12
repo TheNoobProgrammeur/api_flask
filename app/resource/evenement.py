@@ -10,7 +10,7 @@ ns_evenement = api.namespace('evenement', description="evenement operations")
 @ns_evenement.route("")
 class Evenements(Resource):
     def get(self):
-        events = Evenement.query.all()
+        events = Evenement.query.filter_by(isprivate=False)
         res = {}
 
         for event in events:
