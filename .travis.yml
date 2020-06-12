@@ -7,4 +7,4 @@ install:
   - pip install -r requirements.txt
 script:
   - flask db upgrade
-  - pytest
+  - pytest --junitxml=test-results/junit.xml --html=test-results/report.html
