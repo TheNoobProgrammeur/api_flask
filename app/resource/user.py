@@ -5,6 +5,7 @@ from flask_restplus import Resource, fields
 
 from app import api
 from app import db
+from app.model.evenement import Evenement
 from app.model.user import User
 from app.service import token as token_service
 from app.service.token import require_api_token
@@ -12,9 +13,25 @@ from app.service.token import require_api_token
 ns_user = api.namespace('user', description="user operations")
 
 register_definition = api.model('User Informations for Register', {
-    'username': fields.String(required=True),
-    'email': fields.String(required=True),
-    'password': fields.String(required=True)
+    'username': fields.String(required=True, description="Username"),
+    'email': fields.String(required=True, description="User email"),
+    'password': fields.String(required=True, description="User password")
+})
+
+
+login_definition = api.model('User Informations for Login', {
+    'username': fields.String(required=True, description="Username"),
+    'password': fields.String(required=True, description="User password")
+})
+
+evenement_definition = api.model('Evenements Informations for creation', {
+    'titre': fields.String(required=True, description="Titre for new event"),
+    'date': fields.DateTime(required=True, description="Event day"),
+    'description': fields.String
+})
+
+body_delete_event = api.model('Param for delete Evenement', {
+    'id_event': fields.Integer(required=True, description="Event id for delete")
 })
 
 
@@ -44,12 +61,6 @@ class Register(Resource):
             return {"response": "SUCCESS", "message": "Your is resisted"}
 
 
-login_definition = api.model('User Informations for Login', {
-    'username': fields.String(required=True),
-    'password': fields.String(required=True)
-})
-
-
 @ns_user.route("/login")
 class Login(Resource):
     @api.expect(login_definition)
@@ -72,18 +83,65 @@ class Login(Resource):
             return {"response": "SUCCESS", "message": "Your is identified"}
 
 
-@ns_user.route("/")
+@ns_user.route("")
 class Delete(Resource):
     @require_api_token
     def delete(self):
-        token = session['api_sessions_token']
-
-        id = token_service.get_id_by_token(token)
-        user = User.query.filter_by(id=id).first()
-
+        user = token_service.get_user_by_token()
         db.session.delete(user)
         db.session.commit()
-
         del session['api_sessions_token']
-
         return {"response": "SUCCESS", "message": "Goodbye."}
+
+
+@ns_user.route("/evenement")
+class GestionEvenement(Resource):
+    @require_api_token
+    def get(self):
+        user = token_service.get_user_by_token()
+
+        evenements = user.evenements_cree
+
+        res = {}
+        indice = 0
+        for event in evenements:
+            res[indice] = {"id": event.id, "titre": event.titre, "description": event.description,
+                           "date": str(event.date),
+                           "autheur": event.author.username}
+            indice += 1
+
+        return {"response": "SUCCESS", "message": "Liste des evenement.", "evenements": res}
+
+    @require_api_token
+    @api.expect(evenement_definition)
+    def post(self):
+        data = request.get_json()
+
+        user = token_service.get_user_by_token()
+
+        evenement = Evenement(author=user)
+        evenement.titre = data["titre"]
+        evt_date = data["date"]
+        evenement.date = evt_date
+        evenement.description = data["description"]
+
+        db.session.add(evenement)
+        db.session.commit()
+
+        return {"response": "SUCCESS", "message": "Evenement is created"}
+
+    @require_api_token
+    @api.expect(body_delete_event)
+    def delete(self):
+        data = request.get_json()
+
+        id_event = data["id_event"]
+
+        user = token_service.get_user_by_token()
+
+        evenement = user.evenements_cree.filter_by(id=id_event).first()
+
+        db.session.delete(evenement)
+        db.session.commit()
+
+        return {"response": "SUCCESS", "message": "Evenement is delete"}

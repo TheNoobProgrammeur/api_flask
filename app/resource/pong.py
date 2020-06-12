@@ -6,7 +6,7 @@ from app.service.token import *
 ns_pong = api.namespace('ping', description="ping operations")
 
 
-@ns_pong.route("/")
+@ns_pong.route("")
 class Pong(Resource):
     @require_api_token
     def get(self):

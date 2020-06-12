@@ -6,6 +6,7 @@ import jwt
 from flask import session, Response
 
 from app import app
+from app.model.user import User
 
 
 def require_api_token(func):
@@ -29,19 +30,18 @@ def encode_auth_token(user_id):
     Generates the Auth Token
     :return: string
     """
-    try:
-        payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
-            'iat': datetime.datetime.utcnow(),
-            'sub': user_id
-        }
-        return jwt.encode(
-            payload,
-            app.config.get('SECRET_KEY'),
-            algorithm='HS256'
-        )
-    except Exception as e:
-        return e
+
+    payload = {
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
+        'iat': datetime.datetime.utcnow(),
+        'sub': user_id
+    }
+
+    return jwt.encode(
+        payload,
+        app.config.get('SECRET_KEY'),
+        algorithm='HS256'
+    )
 
 
 def decode_auth_token(auth_token):
@@ -61,5 +61,8 @@ def decode_auth_token(auth_token):
         return False
 
 
-def get_id_by_token(auth_token):
-    return decode_auth_token(auth_token)
+def get_user_by_token():
+    token = session['api_sessions_token']
+    id = decode_auth_token(token)
+    user = User.query.filter_by(id=id).first()
+    return user
