@@ -115,7 +115,7 @@ def test_get_event(setup_app):
     })
 
     titre_event = "Enenement de Test"
-    date_event = '2020-08-11 12:30:00'
+    date_event = '2020-11-08 12:30:00'
     description = "Test de creation event"
 
     setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
