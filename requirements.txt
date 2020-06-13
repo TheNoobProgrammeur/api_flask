@@ -31,3 +31,4 @@ flask_login
 gunicorn
 pylint
 pytest-html
+pytest-cov
