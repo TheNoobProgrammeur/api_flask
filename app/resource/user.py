@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime
 
 from flask import request, session
 from flask_restplus import Resource, fields
@@ -130,7 +131,7 @@ class GestionEvenement(Resource):
         evenement = Evenement(author=user)
         evenement.titre = data["titre"]
         evt_date = data["date"]
-        evenement.date = evt_date
+        evenement.date = datetime.strptime(evt_date, '%d/%m/%Y %H:%M')
         evenement.description = data["description"]
 
         db.session.add(evenement)
