@@ -90,7 +90,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --junitxml=test-results/junit.xml --html=test-results/report.html --cov=test-results
+            pytest --junitxml=test-results/junit.xml --html=test-results/report.html --cov=./
           environment:
             CONDUIT_SECRET: 'something-really-secret'
             FLASK_APP: /home/circleci/repo/run.py
