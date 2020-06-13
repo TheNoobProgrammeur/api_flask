@@ -12,5 +12,4 @@ Elle évoluera aux files de mes envies .... pour sans doute aller nulle part.
 ## Heroku :
 
 L'application est deployé sur heroku :  
-https://intense-gorge-16558
-.herokuapp.com/
+https://intense-gorge-16558.herokuapp.com/
