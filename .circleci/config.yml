@@ -97,6 +97,11 @@ jobs:
             FLASK_DEBUG: 1
             DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/myUsr
 
+      - run:
+          name: codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash)
+
       - store_test_results:
           path: test-results
 
