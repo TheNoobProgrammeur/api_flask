@@ -87,22 +87,17 @@ jobs:
       # run tests!
       # https://pytest.org
       - run:
-          name: run tests
+          name: run tests and coverage
           command: |
             . venv/bin/activate
-            pytest --junitxml=test-results/junit.xml --html=test-results/report.html
+            pytest --junitxml=test-results/junit.xml --html=test-results/report.html --cov=./
+            bash <(curl -s https://codecov.io/bash)
           environment:
             CONDUIT_SECRET: 'something-really-secret'
             FLASK_APP: /home/circleci/repo/run.py
             FLASK_DEBUG: 1
             DATABASE_URL: postgresql://myUsr:somePwd@localhost:5432/myUsr
 
-      - run:
-          name: codecov
-          command: |
-            . venv/bin/activate
-            pytest --cov=./
-            bash <(curl -s https://codecov.io/bash)
 
       - store_test_results:
           path: test-results
