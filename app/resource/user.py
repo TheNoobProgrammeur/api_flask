@@ -83,6 +83,14 @@ class Login(Resource):
             return {"response": "SUCCESS", "message": "Your is identified"}
 
 
+@ns_user.route("/logout")
+class Logout(Resource):
+    @require_api_token
+    def get(self):
+        del session['api_sessions_token']
+        return {"response": "SUCCESS", "message": "Your session is delete"}
+
+
 @ns_user.route("")
 class Delete(Resource):
     @require_api_token

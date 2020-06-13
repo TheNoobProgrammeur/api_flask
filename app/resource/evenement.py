@@ -10,6 +10,10 @@ ns_evenement = api.namespace('evenement', description="evenement operations")
 @ns_evenement.route("")
 class Evenements(Resource):
     def get(self):
+        """
+        return l'ensemble des events public
+        :return: dict
+        """
         events = Evenement.query.filter_by(isprivate=False)
         res = {}
 
@@ -24,6 +28,11 @@ class Evenements(Resource):
 @ns_evenement.param('id_evenement', 'The evenement ID')
 class GestionEvenement(Resource):
     def get(self, id_evenement):
+        """
+
+        :param id_evenement:
+        :return: dict
+        """
         event: Evenement = Evenement.query.get(id_evenement)
 
         if event is None:
@@ -44,14 +53,34 @@ class GestionEvenement(Resource):
 
     @require_api_token
     def put(self, id_evenement):
+        """
+
+        :param id_evenement:
+        :return:
+        """
         event: Evenement = Evenement.query.get(id_evenement)
         user = get_user_by_token()
 
         if user is None:
-            return {"response": "Error", "message": "Inscription Not autorized"}
+            return {"response": "Error", "message": "Inscription Not autorized"}, 403
 
         event.inscrits.append(user)
 
         db.session.commit()
 
         return {"response": "SUCCESS", "message": "Inscription for Evenement : " + str(id_evenement) + " is validate"}
+
+    @require_api_token
+    def delete(self,id_evenement):
+        event: Evenement = Evenement.query.get(id_evenement)
+        user = get_user_by_token()
+
+        if user not in event.inscrits :
+            if user is None:
+                return {"response": "Error", "message": "User  Not autorized"}, 403
+
+        event.inscrits.remove(user)
+
+        db.session.commit()
+
+        return {"response": "SUCCESS", "message": "Desinscription for Evenement : " + str(id_evenement) + " is validate"}

@@ -12,6 +12,12 @@ from app.model.user import User
 def require_api_token(func):
     @wraps(func)
     def check_token(*args, **kwargs):
+        """
+        Decorateur qui verifie la validiter du token de session
+        :param args:
+        :param kwargs:
+        :return:
+        """
         if "api_sessions_token" not in session:
             return {"response": "ERROR : token incorrect"}, 403
 
@@ -62,6 +68,10 @@ def decode_auth_token(auth_token):
 
 
 def get_user_by_token():
+    """
+    Permet de renvoyé le user courent grasse au token de session
+    :return User
+    """
     token = session['api_sessions_token']
     id = decode_auth_token(token)
     user = User.query.filter_by(id=id).first()

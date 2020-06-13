@@ -115,7 +115,7 @@ def test_get_event(setup_app):
     })
 
     titre_event = "Enenement de Test"
-    date_event = '2020-11-08 12:30:00'
+    date_event = '2020-08-11 12:30:00'
     description = "Test de creation event"
 
     setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
@@ -135,7 +135,9 @@ def test_get_event(setup_app):
     assert 200 == response.status_code
 
 
-def test_delete(setup_app):
+def test_logout(setup_app):
+    application = setup_app["client_test"]
+
     username = "antoine_test"
     password = "azerty"
 
@@ -144,8 +146,31 @@ def test_delete(setup_app):
         "password": password
     })
 
-    setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
-                                 data=payload)
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    response = application.get('/user/logout')
+
+    assert 200 == response.status_code
+
+    response = application.get('/ping')
+
+    assert 403 == response.status_code
+
+
+def test_delete(setup_app):
+    application = setup_app["client_test"]
+
+    username = "antoine_test"
+    password = "azerty"
+
+    payload = json.dumps({
+        "username": username,
+        "password": password
+    })
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
 
     user = User.query.filter_by(username=username).first()
     id_event = 0
@@ -156,6 +181,6 @@ def test_delete(setup_app):
         "id_event": id_event
     })
 
-    response = setup_app["client_test"].delete('/user', headers={"Content-Type": "application/json"},
-                                               data=payload)
+    response = application.delete('/user', headers={"Content-Type": "application/json"},
+                                  data=payload)
     assert 200 == response.status_code
