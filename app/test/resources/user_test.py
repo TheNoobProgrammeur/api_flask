@@ -206,3 +206,5 @@ def test_delete(setup_app):
     response = application.delete('/user', headers={"Content-Type": "application/json"},
                                   data=payload)
     assert 200 == response.status_code
+    assert str == type(response.json['message'])
+    assert "Goodbye." == response.json['message']

@@ -41,25 +41,22 @@ class Register(Resource):
     @api.expect(register_definition)
     def post(self):
         data = request.get_json()
-        if not data:
-            data = {"response": "ERROR"}
-            return data, 404
-        else:
-            user = User()
-            user.username = data.get("username")
-            user.email = data.get("email")
 
-            password: str = data.get("password")
+        user = User()
+        user.username = data.get("username")
+        user.email = data.get("email")
 
-            user.password_hash = hashlib.sha256(password.encode("UTF-8")).hexdigest()
+        password: str = data.get("password")
 
-            db.session.add(user)
-            db.session.commit()
+        user.password_hash = hashlib.sha256(password.encode("UTF-8")).hexdigest()
 
-            rep = token_service.encode_auth_token(user.id)
-            session['api_sessions_token'] = rep
+        db.session.add(user)
+        db.session.commit()
 
-            return {"response": "SUCCESS", "message": "Your is resisted"}
+        rep = token_service.encode_auth_token(user.id)
+        session['api_sessions_token'] = rep
+
+        return {"response": "SUCCESS", "message": "Your is resisted"}
 
 
 @ns_user.route("/login")
@@ -67,9 +64,6 @@ class Login(Resource):
     @api.expect(login_definition)
     def get(self):
         data = request.get_json()
-        if not data:
-            data = {"response": "ERROR"}
-            return data, 404
 
         username = data.get("username")
         password: str = data.get("password")
