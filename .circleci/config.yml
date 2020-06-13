@@ -90,7 +90,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --junitxml=test-results/junit.xml --html=test-results/report.html --cov=./
+            pytest --junitxml=test-results/junit.xml --html=test-results/report.html
           environment:
             CONDUIT_SECRET: 'something-really-secret'
             FLASK_APP: /home/circleci/repo/run.py
@@ -100,6 +100,8 @@ jobs:
       - run:
           name: codecov
           command: |
+            . venv/bin/activate
+            pytest --cov=./
             bash <(curl -s https://codecov.io/bash)
 
       - store_test_results:
