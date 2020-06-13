@@ -3,6 +3,7 @@ import json
 import pytest
 
 from app import app
+from app.model.evenement import Evenement
 from app.model.user import User
 
 
@@ -156,6 +157,35 @@ def test_get_event(setup_app):
 
     assert 200 == response.status_code
 
+
+def test_delete_event(setup_app):
+    application = setup_app["client_test"]
+
+    username = "antoine_test"
+    password = "azerty"
+
+    payload = json.dumps({
+        "username": username,
+        "password": password
+    })
+
+    evenement = Evenement.query.filter_by(titre="Enenement de Test").first()
+
+    id = evenement.id
+
+    payload_idEvent = json.dumps({
+        "id_event": id
+    })
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    response = application.delete('/user/evenement', headers={"Content-Type": "application/json"},
+                    data=payload_idEvent)
+
+    assert 200 == response.status_code
+    assert str == type(response.json['message'])
+    assert "Evenement is delete" == response.json['message']
 
 def test_logout(setup_app):
     application = setup_app["client_test"]
