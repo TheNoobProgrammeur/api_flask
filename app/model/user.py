@@ -1,7 +1,7 @@
 from sqlalchemy.orm import relationship
 
 from app import db
-from app.model.tables import inscription_list, followers
+from app.model.tables import inscription_list, followers, request_followers
 
 
 class User(db.Model):
@@ -16,6 +16,11 @@ class User(db.Model):
         primaryjoin=(followers.c.follower_id == id),
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+    request_follwed = db.relationship(
+        'User', secondary=request_followers,
+        primaryjoin=(request_followers.c.follower_id == id),
+        secondaryjoin=(request_followers.c.followed_id == id),
+        backref=db.backref('request_followers', lazy='dynamic'), lazy='dynamic')
 
     def __repr__(self):
         return 'User {}'.format(self.username)

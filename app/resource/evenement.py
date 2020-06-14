@@ -13,7 +13,7 @@ class Evenements(Resource):
     def get(self):
         """
         return l'ensemble des events public
-        et des events créée par les utilisateur que le user follow 
+        et des events créée par les utilisateur que le user follow
         :return: dict
         """
 
