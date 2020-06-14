@@ -5,3 +5,8 @@ inscription_list = Table('inscription', db.metadata,
                          Column('user_id', Integer, ForeignKey('user.id')),
                          Column('evenement_id', Integer, ForeignKey('evenement.id'))
                          )
+
+followers = db.Table('followers',
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+                     )

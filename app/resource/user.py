@@ -19,7 +19,6 @@ register_definition = api.model('User Informations for Register', {
     'password': fields.String(required=True, description="User password")
 })
 
-
 login_definition = api.model('User Informations for Login', {
     'username': fields.String(required=True, description="Username"),
     'password': fields.String(required=True, description="User password")
@@ -28,7 +27,8 @@ login_definition = api.model('User Informations for Login', {
 evenement_definition = api.model('Evenements Informations for creation', {
     'titre': fields.String(required=True, description="Titre for new event"),
     'date': fields.DateTime(required=True, description="Event day"),
-    'description': fields.String
+    'description': fields.String,
+    'isPrivate': fields.Boolean(default=False)
 })
 
 body_delete_event = api.model('Param for delete Evenement', {
@@ -97,6 +97,38 @@ class Delete(Resource):
         return {"response": "SUCCESS", "message": "Goodbye."}
 
 
+@ns_user.route("")
+class GestionUser(Resource):
+    @require_api_token
+    def get(self):
+        user = token_service.get_user_by_token()
+        evenements = user.evenements_cree
+        evenement_follow = user.evenements
+        followeds = user.followed
+        profile = {"username": user.username, "email": user.email}
+
+        indice = 0
+        profile["evenements"] = {}
+        for event in evenements:
+            profile["evenements"][indice] = {"id": event.id, "titre": event.titre, "description": event.description,
+                                             "date": str(event.date)}
+            indice += 1
+
+        indice = 0
+        profile["followEvent"] = {}
+        for event in evenement_follow:
+            profile["followEvent"][indice] = {"id": event.id, "titre": event.titre, "description": event.description,
+                                              "date": str(event.date), "autheur": event.author.username}
+            indice += 1
+
+        indice = 0
+        profile["amies"] = {}
+        for followed in followeds:
+            profile["amies"][indice] = {"username": followed.username}
+
+        return {"response": "SUCCESS", "message": "Your profile", "profile": profile}
+
+
 @ns_user.route("/evenement")
 class GestionEvenement(Resource):
     @require_api_token
@@ -126,7 +158,11 @@ class GestionEvenement(Resource):
         evenement.titre = data["titre"]
         evt_date = data["date"]
         evenement.date = datetime.strptime(evt_date, '%d/%m/%Y %H:%M')
-        evenement.description = data["description"]
+        if "description" in data:
+            evenement.description = data["description"]
+
+        if "isPrivate" in data:
+            evenement.description = data["isPrivate"]
 
         db.session.add(evenement)
         db.session.commit()
@@ -148,3 +184,18 @@ class GestionEvenement(Resource):
         db.session.commit()
 
         return {"response": "SUCCESS", "message": "Evenement is delete"}
+
+
+@ns_user.route("/follower")
+class Follower(Resource):
+    @require_api_token
+    def get(self):
+        user = token_service.get_user_by_token()
+        followeds = user.followed
+
+        indice = 0
+        follo = {}
+        for followed in followeds:
+            follo[indice] = {"username": followed.username}
+
+        return {"response": "SUCCESS", "message": "You follow", "followeds": follo}

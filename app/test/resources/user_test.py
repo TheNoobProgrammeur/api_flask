@@ -94,6 +94,30 @@ def test_login_error_username(setup_app):
     assert "ERROR : user or login incorrect" == response.json["response"]
 
 
+def test_see_profile(setup_app):
+    application = setup_app["client_test"]
+
+    username = "antoine_test"
+    password = "azerty"
+    email = "test@test.gouv"
+
+    payload = json.dumps({
+        "username": username,
+        "password": password
+    })
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    response = application.get('/user')
+
+    profile = response.json['profile']
+
+    assert 200 == response.status_code
+    assert dict == type(profile)
+    assert username == profile["username"]
+    assert email == profile["email"]
+
 def test_create_event(setup_app):
     application = setup_app["client_test"]
 
@@ -181,11 +205,12 @@ def test_delete_event(setup_app):
                     data=payload)
 
     response = application.delete('/user/evenement', headers={"Content-Type": "application/json"},
-                    data=payload_idEvent)
+                                  data=payload_idEvent)
 
     assert 200 == response.status_code
     assert str == type(response.json['message'])
     assert "Evenement is delete" == response.json['message']
+
 
 def test_logout(setup_app):
     application = setup_app["client_test"]
