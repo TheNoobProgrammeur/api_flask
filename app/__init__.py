@@ -13,4 +13,4 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 from app.resource import pong, user, evenement
-from app.model import user, evenement
+from app.model import user, evenement,message, discution

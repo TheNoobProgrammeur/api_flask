@@ -6,6 +6,7 @@ from flask_restplus import Resource, fields
 
 from app import api
 from app import db
+from app.model.discution import Discution
 from app.model.evenement import Evenement
 from app.model.user import User
 from app.service import token as token_service
@@ -193,6 +194,11 @@ class GestionEvenement(Resource):
             evenement.description = data["isPrivate"]
 
         db.session.add(evenement)
+
+        discution = Discution(evenemnt=evenement)
+
+        db.session.add(discution)
+
         db.session.commit()
 
         return {"response": "SUCCESS", "message": "Evenement is created"}
@@ -265,3 +271,4 @@ class AcceptationFollower(Resource):
             db.session.commit()
 
         return {"response": "SUCCESS", "message": "You accept request follow user " + str(id_user)}
+
