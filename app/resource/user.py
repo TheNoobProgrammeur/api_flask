@@ -231,11 +231,11 @@ class Follower(Resource):
         followeds = user.followed
 
         indice = 0
-        follo = {}
+        follow = {}
         for followed in followeds:
-            follo[indice] = {"username": followed.username}
+            follow[indice] = {"username": followed.username}
 
-        return {"response": "SUCCESS", "message": "You follow", "followeds": follo}
+        return {"response": "SUCCESS", "message": "You follow", "followeds": follow}
 
 
 @ns_user.route("/follower/<int:id_user>")

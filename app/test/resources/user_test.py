@@ -242,17 +242,18 @@ def test_delete_event(setup_app):
     assert "Evenement is delete" == response.json['message']
 
 
-def test_follower_user(setup_app,gestion_user):
+def test_follower_user(setup_app, gestion_user):
     application = setup_app["client_test"]
     user_follow = User.query.filter_by(username="antoine_test2").first()
+
     id = user_follow.id
 
-    response = application.post('/user/follower/'+str(id))
+    response = application.post('/user/follower/' + str(id))
 
     assert 200 == response.status_code
 
 
-def test_accept_request_follwed(setup_app,gestion_user):
+def test_accept_request_follwed(setup_app, gestion_user):
     application = setup_app["client_test"]
     payload = setup_app["user2"]
     user_follow = User.query.filter_by(username="antoine_test2").first()
@@ -268,6 +269,48 @@ def test_accept_request_follwed(setup_app,gestion_user):
     response = application.post('/user/follower/accept/' + str(id_user1))
     assert 200 == response.status_code
 
+
+def test_get_follow(setup_app, gestion_user):
+
+    application = setup_app["client_test"]
+    payload2 = setup_app["user2"]
+    user_follow = User.query.filter_by(username="antoine_test2").first()
+    id_user2 = user_follow.id
+
+    user = User.query.filter_by(username="antoine_test").first()
+    id_user1 = user.id
+
+    application.get('/user/logout')
+
+    username = "antoine_test"
+    password = "azerty"
+
+    payload = json.dumps({
+        "username": username,
+        "password": password
+    })
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    application.post('/user/follower/' + str(id_user2))
+
+    application.get('/user/logout')
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload2)
+    application.post('/user/follower/accept/' + str(id_user1))
+    
+    application.get('/user/logout')
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    response = application.get('/user/follower')
+    followeds = response.json['followeds']
+    assert 200 == response.status_code
+    assert dict == type(followeds)
+    assert 1 == len(followeds)
 
 
 def test_logout(setup_app):
