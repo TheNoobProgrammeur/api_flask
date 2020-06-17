@@ -100,13 +100,18 @@ class GestionEvenement(Resource):
                 "message": "Desinscription for Evenement : " + str(id_evenement) + " is validate"}
 
 
+body_post_message = api.model('Body for post message', {
+    'id_event': fields.String(required=True, description="Message text")
+})
+
+
 @ns_evenement.route("/conversation/<int:id_evenement>")
 class Conversation(Resource):
     def get(self, id_evenement):
         event: Evenement = Evenement.query.get(id_evenement)
         user = token_service.get_user_by_token()
 
-        if event is None :
+        if event is None:
             return {"response": "Error", "message": "Evenement  Not Founf"}, 404
 
         if event.isprivate:
@@ -119,12 +124,14 @@ class Conversation(Resource):
         id_message = 0
         message: Message
         for message in discution.message:
-            reponse[id_message] = {"author": message.author, "message": message.text, "date": str(message.date.strftime('%d/%m/%Y %H:%M:%S'))}
+            reponse[id_message] = {"author": message.author, "message": message.text,
+                                   "date": str(message.date.strftime('%d/%m/%Y %H:%M:%S'))}
             id_message += 1
 
         return {"response": "SUCCESS",
                 "message": "Discution  for Evenement : " + str(id_evenement), "discusion": reponse}
 
+    @api.expect(body_post_message)
     def post(self, id_evenement):
         data = request.get_json()
         data_message = data["message"]
