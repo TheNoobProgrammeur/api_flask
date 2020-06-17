@@ -1,7 +1,10 @@
+from flask import request
 from flask_restplus import Resource, fields
 
 from app import api, db
+from app.model.discution import Discution
 from app.model.evenement import Evenement
+from app.model.message import Message
 from app.service.token import require_api_token
 from app.service import token as token_service
 
@@ -95,3 +98,47 @@ class GestionEvenement(Resource):
 
         return {"response": "SUCCESS",
                 "message": "Desinscription for Evenement : " + str(id_evenement) + " is validate"}
+
+
+@ns_evenement.route("/conversation/<int:id_evenement>")
+class Conversation(Resource):
+    def get(self, id_evenement):
+        event: Evenement = Evenement.query.get(id_evenement)
+        user = token_service.get_user_by_token()
+
+        if event is None :
+            return {"response": "Error", "message": "Evenement  Not Founf"}, 404
+
+        if event.isprivate:
+            if user is None or user not in event.inscrits:
+                return {"response": "Error", "message": "User  Not autorized"}, 403
+
+        discution: Discution = event.discution
+
+        reponse = {}
+        id_message = 0
+        message: Message
+        for message in discution.message:
+            reponse[id_message] = {"author": message.author, "message": message.text, "date": str(message.date.strftime('%d/%m/%Y %H:%M:%S'))}
+            id_message += 1
+
+        return {"response": "SUCCESS",
+                "message": "Discution  for Evenement : " + str(id_evenement), "discusion": reponse}
+
+    def post(self, id_evenement):
+        data = request.get_json()
+        data_message = data["message"]
+
+        event: Evenement = Evenement.query.get(id_evenement)
+        user = token_service.get_user_by_token()
+
+        message = Message(message_author=user)
+        message.text = data_message
+
+        discution: Discution = event.discution
+        discution.message.append(message)
+
+        db.session.commit()
+
+        return {"response": "SUCCESS",
+                "message": "Discution  for Evenement"}

@@ -262,7 +262,7 @@ class AcceptationFollower(Resource):
     @require_api_token
     def post(self, id_user):
         user: User = token_service.get_user_by_token()
-        user_follower:User = User.query.get(id_user)
+        user_follower: User = User.query.get(id_user)
 
         if user_follower in user.request_follwed:
             user_follower.followed.append(user)
@@ -271,4 +271,3 @@ class AcceptationFollower(Resource):
             db.session.commit()
 
         return {"response": "SUCCESS", "message": "You accept request follow user " + str(id_user)}
-

@@ -21,7 +21,7 @@ class User(db.Model):
         primaryjoin=(request_followers.c.follower_id == id),
         secondaryjoin=(request_followers.c.followed_id == id),
         backref=db.backref('request_followers', lazy='dynamic'), lazy='dynamic')
-    message_ecrit = db.relationship('Message', backref='author', lazy='dynamic', cascade="all, delete-orphan")
+    message_ecrit = db.relationship('Message', backref='message_author', lazy='dynamic', cascade="all, delete-orphan")
 
     def __repr__(self):
         return 'User {}'.format(self.username)
