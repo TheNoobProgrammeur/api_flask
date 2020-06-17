@@ -105,6 +105,11 @@ def gestion_user(setup_app):
 
     aplication.delete('/user')
 
+    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+                   data=payload_user3)
+
+    aplication.delete('/user')
+
 
 def test_get_evenements(setup_app, gestion_user):
     aplication = setup_app["client_test"]
