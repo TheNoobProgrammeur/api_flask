@@ -115,7 +115,7 @@ class Conversation(Resource):
             return {"response": "Error", "message": "Evenement  Not Founf"}, 404
 
         if event.isprivate:
-            if user is None or user not in event.inscrits:
+            if user is None and user not in event.inscrits:
                 return {"response": "Error", "message": "User  Not autorized"}, 403
 
         discution: Discution = event.discution
