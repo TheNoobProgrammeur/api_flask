@@ -114,7 +114,7 @@ def gestion_user(setup_app):
 def test_get_evenements(setup_app, gestion_user):
     aplication = setup_app["client_test"]
 
-    events = Evenement.query.all()
+    events = Evenement.query.filter_by(isprivate=False).all()
 
     response = aplication.get('/evenement', headers={"Content-Type": "application/json"})
 

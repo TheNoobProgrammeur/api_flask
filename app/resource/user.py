@@ -191,7 +191,7 @@ class GestionEvenement(Resource):
             evenement.description = data["description"]
 
         if "isPrivate" in data:
-            evenement.description = data["isPrivate"]
+            evenement.isprivate = data["isPrivate"]
 
         db.session.add(evenement)
 
