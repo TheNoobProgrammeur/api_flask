@@ -143,7 +143,10 @@ class Conversation(Resource):
 
         message = Message(message_author=user)
         message.text = data_message
-        message.date = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        try:
+            message.date = datetime.now().strftime('%d/%m/%y %H:%M:%S')
+        except:
+            message.date = datetime.now()
 
         discution: Discution = event.discution
         discution.message.append(message)
