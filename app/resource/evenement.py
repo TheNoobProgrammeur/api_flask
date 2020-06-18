@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import request
 from flask_restplus import Resource, fields
 
@@ -141,6 +143,7 @@ class Conversation(Resource):
 
         message = Message(message_author=user)
         message.text = data_message
+        message.date = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         discution: Discution = event.discution
         discution.message.append(message)
