@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import sqlalchemy
 from flask import request
 from flask_restplus import Resource, fields
 
@@ -143,15 +144,19 @@ class Conversation(Resource):
 
         message = Message(message_author=user)
         message.text = data_message
-        try:
-            message.date = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-        except:
-            message.date = datetime.now()
+
+        message.date = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         discution: Discution = event.discution
         discution.message.append(message)
+        try:
+            db.session.commit()
 
-        db.session.commit()
+        except sqlalchemy.exc.DataError:
+            discution.message.delete(message)
+            message.date = None
+            discution.message.append(message)
+            db.session.commit()
 
         return {"response": "SUCCESS",
                 "message": "Discution  for Evenement"}
