@@ -220,6 +220,13 @@ def test_conversation(setup_app, gestion_user):
 
     application.put('/evenement/' + str(id))
 
+    payload = json.dumps({
+        "message": "message test"
+    })
+
+    application.post('/evenement/conversation/' + str(id), headers={"Content-Type": "application/json"},
+                                data=payload)
+
     response = application.get('/evenement/conversation/' + str(id))
     discusion = response.json['discusion']
 
