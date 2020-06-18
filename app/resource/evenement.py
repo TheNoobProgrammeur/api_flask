@@ -101,7 +101,7 @@ class GestionEvenement(Resource):
 
 
 body_post_message = api.model('Body for post message', {
-    'id_event': fields.String(required=True, description="Message text")
+    'message': fields.String(required=True, description="Message text")
 })
 
 
