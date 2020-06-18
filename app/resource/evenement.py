@@ -144,7 +144,7 @@ class Conversation(Resource):
         message = Message(message_author=user)
         message.text = data_message
         try:
-            message.date = datetime.now().strftime('%d/%m/%y %H:%M:%S')
+            message.date = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         except:
             message.date = datetime.now()
 
