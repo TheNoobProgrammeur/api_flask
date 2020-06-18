@@ -184,6 +184,29 @@ def test_inscription(setup_app, gestion_user):
     assert 1 == len(evenement.inscrits)
 
 
+def test_send_message(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    payload_user2 = setup_app["user2"]
+
+    evenement = Evenement.query.filter_by(titre="Enenement de Test").first()
+
+    id = evenement.id
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload_user2)
+
+    application.put('/evenement/' + str(id))
+
+    payload = json.dumps({
+        "message": "message test"
+    })
+
+    response = application.post('/evenement/conversation/' + str(id), headers={"Content-Type": "application/json"},
+                                data=payload)
+
+    assert 200 == response.status_code
+
+
 def test_conversation(setup_app, gestion_user):
     application = setup_app["client_test"]
     payload_user2 = setup_app["user2"]
