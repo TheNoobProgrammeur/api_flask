@@ -152,7 +152,7 @@ class Conversation(Resource):
         try:
             db.session.commit()
 
-        except sqlalchemy.exc.DataError:
+        except :
             discution.message.delete(message)
             message.date = None
             discution.message.append(message)
