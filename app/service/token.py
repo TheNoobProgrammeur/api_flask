@@ -72,6 +72,9 @@ def get_user_by_token():
     Permet de renvoyé le user courent grasse au token de session
     :return User
     """
+
+    if 'api_sessions_token' not in session:
+        return None
     token = session['api_sessions_token']
     id = decode_auth_token(token)
     user = User.query.filter_by(id=id).first()

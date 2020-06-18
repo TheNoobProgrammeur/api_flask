@@ -9,9 +9,38 @@ from app.model.user import User
 
 @pytest.fixture
 def setup_app():
+    application = app.test_client()
+
+    username2 = "antoine_test2"
+    password2 = "azerty2"
+    email2 = "test2@test.ts"
+
+    payload_user2 = json.dumps({
+        "username": username2,
+        "email": email2,
+        "password": password2
+    })
+
     return {
-        "client_test": app.test_client()
+        "user2": payload_user2,
+        "client_test": application
     }
+
+
+@pytest.fixture
+def gestion_user(setup_app):
+    aplication = setup_app["client_test"]
+    payload_user2 = setup_app["user2"]
+
+    aplication.post('/user/register', headers={"Content-Type": "application/json"},
+                    data=payload_user2)
+
+    yield
+
+    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+                   data=payload_user2)
+
+    aplication.delete('/user')
 
 
 def test_register(setup_app):
@@ -92,6 +121,31 @@ def test_login_error_username(setup_app):
 
     assert 403 == response.status_code
     assert "ERROR : user or login incorrect" == response.json["response"]
+
+
+def test_see_profile(setup_app):
+    application = setup_app["client_test"]
+
+    username = "antoine_test"
+    password = "azerty"
+    email = "test@test.gouv"
+
+    payload = json.dumps({
+        "username": username,
+        "password": password
+    })
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    response = application.get('/user')
+
+    profile = response.json['profile']
+
+    assert 200 == response.status_code
+    assert dict == type(profile)
+    assert username == profile["username"]
+    assert email == profile["email"]
 
 
 def test_create_event(setup_app):
@@ -181,11 +235,83 @@ def test_delete_event(setup_app):
                     data=payload)
 
     response = application.delete('/user/evenement', headers={"Content-Type": "application/json"},
-                    data=payload_idEvent)
+                                  data=payload_idEvent)
 
     assert 200 == response.status_code
     assert str == type(response.json['message'])
     assert "Evenement is delete" == response.json['message']
+
+
+def test_follower_user(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    user_follow = User.query.filter_by(username="antoine_test2").first()
+
+    id = user_follow.id
+
+    response = application.post('/user/follower/' + str(id))
+
+    assert 200 == response.status_code
+
+
+def test_accept_request_follwed(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    payload = setup_app["user2"]
+    user_follow = User.query.filter_by(username="antoine_test2").first()
+    id_user2 = user_follow.id
+
+    user = User.query.filter_by(username="antoine_test").first()
+    id_user1 = user.id
+
+    application.post('/user/follower/' + str(id_user2))
+    application.get('/user/logout')
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+    response = application.post('/user/follower/accept/' + str(id_user1))
+    assert 200 == response.status_code
+
+
+def test_get_follow(setup_app, gestion_user):
+
+    application = setup_app["client_test"]
+    payload2 = setup_app["user2"]
+    user_follow = User.query.filter_by(username="antoine_test2").first()
+    id_user2 = user_follow.id
+
+    user = User.query.filter_by(username="antoine_test").first()
+    id_user1 = user.id
+
+    application.get('/user/logout')
+
+    username = "antoine_test"
+    password = "azerty"
+
+    payload = json.dumps({
+        "username": username,
+        "password": password
+    })
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    application.post('/user/follower/' + str(id_user2))
+
+    application.get('/user/logout')
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload2)
+    application.post('/user/follower/accept/' + str(id_user1))
+    
+    application.get('/user/logout')
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload)
+
+    response = application.get('/user/follower')
+    followeds = response.json['followeds']
+    assert 200 == response.status_code
+    assert dict == type(followeds)
+    assert 1 == len(followeds)
+
 
 def test_logout(setup_app):
     application = setup_app["client_test"]

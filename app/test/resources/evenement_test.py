@@ -28,6 +28,16 @@ def setup_app():
         "password": password2
     })
 
+    username3 = "antoine_test3"
+    password3 = "azerty3"
+    email3 = "test3@test.ts"
+
+    payload_user3 = json.dumps({
+        "username": username3,
+        "email": email3,
+        "password": password3
+    })
+
     titre_event = "Enenement de Test"
     date_event = "11/08/2020 12:30"
     description = "Test de creation event"
@@ -38,10 +48,23 @@ def setup_app():
         "date": date_event
     })
 
+    titre_event_private = "Enenement de Test Private"
+    date_event = "11/08/2020 12:30"
+    description = "Test de creation event"
+
+    payload_event_private = json.dumps({
+        "titre": titre_event_private,
+        "description": description,
+        "date": date_event,
+        "isPrivate": True
+    })
+
     return {
         "user1": payload_user1,
         "user2": payload_user2,
+        "user3": payload_user3,
         "event": payload_event,
+        "event_private": payload_event_private,
         "client_test": app.test_client()
     }
 
@@ -51,7 +74,9 @@ def gestion_user(setup_app):
     aplication = setup_app["client_test"]
     payload_user1 = setup_app["user1"]
     payload_user2 = setup_app["user2"]
+    payload_user3 = setup_app["user3"]
     payload_event = setup_app["event"]
+    payload_event_private = setup_app["event_private"]
 
     aplication.post('/user/register', headers={"Content-Type": "application/json"},
                     data=payload_user1)
@@ -59,8 +84,14 @@ def gestion_user(setup_app):
     aplication.post('/user/evenement', headers={"Content-Type": "application/json"},
                     data=payload_event)
 
+    aplication.post('/user/evenement', headers={"Content-Type": "application/json"},
+                    data=payload_event_private)
+
     aplication.post('/user/register', headers={"Content-Type": "application/json"},
                     data=payload_user2)
+
+    aplication.post('/user/register', headers={"Content-Type": "application/json"},
+                    data=payload_user3)
 
     yield
 
@@ -74,9 +105,16 @@ def gestion_user(setup_app):
 
     aplication.delete('/user')
 
+    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+                   data=payload_user3)
+
+    aplication.delete('/user')
+
 
 def test_get_evenements(setup_app, gestion_user):
     aplication = setup_app["client_test"]
+
+    events = Evenement.query.filter_by(isprivate=False).all()
 
     response = aplication.get('/evenement', headers={"Content-Type": "application/json"})
 
@@ -84,7 +122,7 @@ def test_get_evenements(setup_app, gestion_user):
 
     assert str == type(response.json['message'])
     assert dict == type(eventes)
-    assert 1 == len(eventes)
+    assert len(events) == len(eventes)
     assert 200 == response.status_code
 
 
@@ -144,6 +182,84 @@ def test_inscription(setup_app, gestion_user):
     evenement = Evenement.query.filter_by(titre="Enenement de Test").first()
 
     assert 1 == len(evenement.inscrits)
+
+
+def test_send_message(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    payload_user2 = setup_app["user2"]
+
+    evenement = Evenement.query.filter_by(titre="Enenement de Test").first()
+
+    id = evenement.id
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload_user2)
+
+    application.put('/evenement/' + str(id))
+
+    payload = json.dumps({
+        "message": "message test"
+    })
+
+    response = application.post('/evenement/conversation/' + str(id), headers={"Content-Type": "application/json"},
+                                data=payload)
+
+    assert 200 == response.status_code
+
+
+def test_conversation(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    payload_user2 = setup_app["user2"]
+
+    evenement = Evenement.query.filter_by(titre="Enenement de Test").first()
+
+    id = evenement.id
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload_user2)
+
+    application.put('/evenement/' + str(id))
+
+    payload = json.dumps({
+        "message": "message test"
+    })
+
+    application.post('/evenement/conversation/' + str(id), headers={"Content-Type": "application/json"},
+                                data=payload)
+
+    response = application.get('/evenement/conversation/' + str(id))
+    discusion = response.json['discusion']
+
+    assert 200 == response.status_code
+    assert dict == type(discusion)
+
+
+def test_erro_id_conversation(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    payload_user2 = setup_app["user2"]
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload_user2)
+
+    response = application.get('/evenement/conversation/999')
+
+    assert 404 == response.status_code
+
+
+def test_user_not_inscrit_conversation(setup_app, gestion_user):
+    application = setup_app["client_test"]
+    payload_user3 = setup_app["user3"]
+
+    evenement = Evenement.query.filter_by(titre="Enenement de Test Private").first()
+
+    id = evenement.id
+
+    application.get('/user/login', headers={"Content-Type": "application/json"},
+                    data=payload_user3)
+
+    response = application.get('/evenement/conversation/' + str(id))
+
+    assert 403 == response.status_code
 
 
 def test_desinscription_event(setup_app, gestion_user):
