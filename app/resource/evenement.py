@@ -151,7 +151,6 @@ class Conversation(Resource):
         discution.message.append(message)
         try:
             db.session.commit()
-
         except :
             discution.message.delete(message)
             message.date = None
