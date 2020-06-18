@@ -204,7 +204,7 @@ def test_send_message(setup_app, gestion_user):
     response = application.post('/evenement/conversation/' + str(id), headers={"Content-Type": "application/json"},
                                 data=payload)
 
-    #assert 200 == response.status_code
+    assert 200 == response.status_code
 
 
 def test_conversation(setup_app, gestion_user):
