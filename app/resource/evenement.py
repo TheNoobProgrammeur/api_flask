@@ -149,13 +149,8 @@ class Conversation(Resource):
 
         discution: Discution = event.discution
         discution.message.append(message)
-        try:
-            db.session.commit()
-        except :
-            discution.message.delete(message)
-            message.date = None
-            discution.message.append(message)
-            db.session.commit()
+
+        db.session.commit()
 
         return {"response": "SUCCESS",
                 "message": "Discution  for Evenement"}
