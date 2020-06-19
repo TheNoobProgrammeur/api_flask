@@ -5,9 +5,10 @@
 
 # Projet API Flask
 
-Cette Api me permet de travailler mon python.
+Cette API a pour objectif de permettre une gestion d'avènement.
 
-Elle évoluera aux files de mes envies .... pour sans doute aller nulle part.
+Ce projet est avant tous là pour me permettre de me perfectionner.
+
 
 ## Heroku :
 
