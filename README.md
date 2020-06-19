@@ -5,7 +5,7 @@
 
 # Projet API Flask
 
-Cette API a pour objectif de permettre une gestion d'avènement.
+Cette API a pour objectif de permettre une gestion d'événement.
 
 Ce projet est avant tous là pour me permettre de me perfectionner.
 
