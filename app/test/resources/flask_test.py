@@ -24,13 +24,16 @@ def gestion_user(setup_app):
         "password": password
     })
 
-    res = setup_app["client_test"].post('/user/register', headers={"Content-Type": "application/json"},
+    setup_app["client_test"].post('/user/register', headers={"Content-Type": "application/json"},
                                         data=payload)
 
-    token = res.json['token']
+
 
     yield
 
+    res = setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
+                                        data=payload)
+    token = res.json['token']
     setup_app["client_test"].delete('/user',
                                     headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
