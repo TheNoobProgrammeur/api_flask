@@ -58,10 +58,10 @@ class Register(Resource):
         db.session.add(user)
         db.session.commit()
 
-        rep = token_service.encode_auth_token(user.id)
+        rep = token_service.encode_auth_token(user.id).decode("utf-8")
         session['api_sessions_token'] = rep
 
-        return {"response": "SUCCESS", "message": "Your is resisted"}
+        return {"response": "SUCCESS", "message": "Your is resisted", "token": rep}
 
 
 @ns_user.route("/login")
@@ -82,9 +82,9 @@ class Login(Resource):
         if user is None or hashlib.sha256(password.encode("UTF-8")).hexdigest() != user.password_hash:
             return {"response": "ERROR : user or login incorrect"}, 403
         else:
-            rep = token_service.encode_auth_token(user.id)
+            rep = token_service.encode_auth_token(user.id).decode("utf-8")
             session['api_sessions_token'] = rep
-            return {"response": "SUCCESS", "message": "Your is identified"}
+            return {"response": "SUCCESS", "message": "Your is identified", "token": rep}
 
 
 @ns_user.route("/logout")

@@ -32,3 +32,4 @@ gunicorn
 pylint
 pytest-html
 pytest-cov
+flask_cors
