@@ -5,8 +5,6 @@ import pytest
 from app import app
 
 
-
-
 @pytest.fixture
 def setup_app():
     return {
@@ -26,11 +24,15 @@ def gestion_user(setup_app):
         "password": password
     })
 
-    setup_app["client_test"].post('/user/register', headers={"Content-Type": "application/json"},
-                             data=payload)
+    res = setup_app["client_test"].post('/user/register', headers={"Content-Type": "application/json"},
+                                        data=payload)
+
+    token = res.json['token']
+
     yield
 
-    setup_app["client_test"].delete('/user')
+    setup_app["client_test"].delete('/user',
+                                    headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
 
 def test_smoke(setup_app, gestion_user):

@@ -37,10 +37,12 @@ def gestion_user(setup_app):
 
     yield
 
-    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+    res = aplication.get('/user/login', headers={"Content-Type": "application/json"},
                    data=payload_user2)
 
-    aplication.delete('/user')
+    token = res.json['token']
+
+    aplication.delete('/user', headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
 
 def test_register(setup_app):
@@ -372,11 +374,14 @@ def test_logout(setup_app):
 
     token = response.json['token']
 
+    response = application.get('/ping', headers={"Content-Type": "application/json"})
+    assert 200 == response.status_code
+
     response = application.get('/user/logout', headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
     assert 200 == response.status_code
 
-    response = application.get('/ping', headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
+    response = application.get('/ping', headers={"Content-Type": "application/json"})
 
     assert 403 == response.status_code
 
