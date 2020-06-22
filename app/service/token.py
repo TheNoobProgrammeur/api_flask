@@ -22,10 +22,6 @@ def require_api_token(func):
         if "Authorization" in request.headers:
             token = request.headers.get("Authorization")
 
-            if token is None:
-                logging.error("token not found in headers")
-                return {"response": "ERROR : token not found"}, 403
-
             if not decode_auth_token(token.split("Bearer ").pop()):
                 logging.error("token invalide : " + token.split("Bearer ").pop())
                 return {"response": "ERROR : token expiret"}, 403

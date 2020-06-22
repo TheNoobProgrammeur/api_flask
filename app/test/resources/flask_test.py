@@ -55,3 +55,19 @@ def test_token_error(setup_app, gestion_user):
 
     assert str == type(response.json['response'])
     assert 403 == response.status_code
+
+
+def test_session(setup_app, gestion_user):
+    response = setup_app["client_test"].get('ping')
+
+    assert str == type(response.json['response'])
+    assert 200 == response.status_code
+
+
+def test_session_expired_error(setup_app, gestion_user):
+    setup_app["client_test"].get('/user/logout')
+
+    response = setup_app["client_test"].get('ping')
+
+    assert str == type(response.json['response'])
+    assert 403 == response.status_code
