@@ -19,9 +19,13 @@ def require_api_token(func):
         :return:
         """
 
+        if "Authorization" not in request.headers and 'api_sessions_token' not in session:
+            logging.error("token not found in headers and session")
+            return {"response": "ERROR : token not found"}, 403
+
         token = request.headers.get("Authorization")
-        if token is None:
-            logging.error("token not found")
+        if token is None or 'api_sessions_token' in 'session':
+            logging.error("token not found in headers")
             return {"response": "ERROR : token not found"}, 403
 
         if not decode_auth_token(token.split("Bearer ").pop()):
