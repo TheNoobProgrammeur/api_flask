@@ -19,12 +19,12 @@ def require_api_token(func):
         :return:
         """
         if "api_sessions_token" not in session:
-            return {"response": "ERROR : token incorrect"}, 403
+            return {"response": "ERROR : token incorrect"}, 403, {'Access-Control-Allow-Origin': '*'}
 
         token = session['api_sessions_token']
         if not decode_auth_token(token):
             del session['api_sessions_token']
-            return {"response": "ERROR : token expiret"}, 403
+            return {"response": "ERROR : token expiret"}, 403, {'Access-Control-Allow-Origin': '*'}
 
         return func(*args, **kwargs)
 

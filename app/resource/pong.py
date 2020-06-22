@@ -10,10 +10,10 @@ ns_pong = api.namespace('ping', description="ping operations")
 class Pong(Resource):
     @require_api_token
     def get(self):
-        return {"response": 'pong'}
+        return {"response": 'pong'}, 200, {'Access-Control-Allow-Origin': '*'}
 
 
 @ns_pong.route("/smoke")
 class Smoke(Resource):
     def get(self):
-        return {"response": 'yes man'}
+        return {"response": 'yes man'}, 200, {'Access-Control-Allow-Origin': '*'}
