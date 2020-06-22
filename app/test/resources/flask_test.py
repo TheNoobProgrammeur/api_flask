@@ -5,8 +5,6 @@ import pytest
 from app import app
 
 
-
-
 @pytest.fixture
 def setup_app():
     return {
@@ -27,10 +25,17 @@ def gestion_user(setup_app):
     })
 
     setup_app["client_test"].post('/user/register', headers={"Content-Type": "application/json"},
-                             data=payload)
+                                        data=payload)
+
+
+
     yield
 
-    setup_app["client_test"].delete('/user')
+    res = setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
+                                        data=payload)
+    token = res.json['token']
+    setup_app["client_test"].delete('/user',
+                                    headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
 
 def test_smoke(setup_app, gestion_user):
@@ -45,3 +50,27 @@ def test_ping(setup_app, gestion_user):
 
     assert str == type(response.json['response'])
     assert 200 == response.status_code
+
+
+def test_token_error(setup_app, gestion_user):
+    response = setup_app["client_test"].get('ping', headers={"Content-Type": "application/json",
+                                                             "Authorization": "Bearer azerty"})
+
+    assert str == type(response.json['response'])
+    assert 403 == response.status_code
+
+
+def test_session(setup_app, gestion_user):
+    response = setup_app["client_test"].get('ping')
+
+    assert str == type(response.json['response'])
+    assert 200 == response.status_code
+
+
+def test_session_expired_error(setup_app, gestion_user):
+    setup_app["client_test"].get('/user/logout')
+
+    response = setup_app["client_test"].get('ping')
+
+    assert str == type(response.json['response'])
+    assert 403 == response.status_code
