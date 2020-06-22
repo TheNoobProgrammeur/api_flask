@@ -47,3 +47,11 @@ def test_ping(setup_app, gestion_user):
 
     assert str == type(response.json['response'])
     assert 200 == response.status_code
+
+
+def test_token_error(setup_app, gestion_user):
+    response = setup_app["client_test"].get('ping', headers={"Content-Type": "application/json",
+                                                             "Authorization": "Bearer azerty"})
+
+    assert str == type(response.json['response'])
+    assert 403 == response.status_code
