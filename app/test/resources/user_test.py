@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from app import app
+from app import app, db
 from app.model.evenement import Evenement
 from app.model.user import User
 
