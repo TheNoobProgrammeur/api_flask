@@ -66,7 +66,7 @@ class Register(Resource):
 
 @ns_user.route("/login")
 class Login(Resource):
-    # @api.expect(login_definition)
+    @api.expect(login_definition)
     def get(self):
         """
         Permet a un utilisateur de s'identifier
