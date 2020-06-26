@@ -31,7 +31,7 @@ def gestion_user(setup_app):
 
     yield
 
-    res = setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
+    res = setup_app["client_test"].post('/user/login', headers={"Content-Type": "application/json"},
                                         data=payload)
     token = res.json['token']
     setup_app["client_test"].delete('/user',

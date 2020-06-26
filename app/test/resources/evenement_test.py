@@ -95,17 +95,17 @@ def gestion_user(setup_app):
 
     yield
 
-    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+    aplication.post('/user/login', headers={"Content-Type": "application/json"},
                    data=payload_user1)
 
     aplication.delete('/user')
 
-    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+    aplication.post('/user/login', headers={"Content-Type": "application/json"},
                    data=payload_user2)
 
     aplication.delete('/user')
 
-    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+    aplication.post('/user/login', headers={"Content-Type": "application/json"},
                    data=payload_user3)
 
     aplication.delete('/user')
@@ -134,7 +134,7 @@ def test_get_evenement_by_id(setup_app, gestion_user):
 
     id = evenement.id
 
-    aplication.get('/user/login', headers={"Content-Type": "application/json"},
+    aplication.post('/user/login', headers={"Content-Type": "application/json"},
                    data=payload_user2)
 
     response = aplication.get('/evenement/' + str(id), headers={"Content-Type": "application/json"})

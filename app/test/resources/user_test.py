@@ -37,7 +37,7 @@ def gestion_user(setup_app):
 
     yield
 
-    res = aplication.get('/user/login', headers={"Content-Type": "application/json"},
+    res = aplication.post('/user/login', headers={"Content-Type": "application/json"},
                    data=payload_user2)
 
     token = res.json['token']
@@ -74,7 +74,7 @@ def test_login(setup_app):
         "password": password
     })
 
-    response = setup_app["client_test"].get('/user/login', headers={"Content-Type": "application/json"},
+    response = setup_app["client_test"].post('/user/login', headers={"Content-Type": "application/json"},
                                             data=payload)
 
     assert 200 == response.status_code
@@ -86,7 +86,7 @@ def test_login(setup_app):
 def test_login_error_no_data(setup_app):
     application = setup_app["client_test"]
 
-    response = application.get('/user/login')
+    response = application.post('/user/login')
 
     assert 400 == response.status_code
 
@@ -102,7 +102,7 @@ def test_login_error_password(setup_app):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
 
     assert 403 == response.status_code
@@ -120,7 +120,7 @@ def test_login_error_username(setup_app):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
 
     assert 403 == response.status_code
@@ -139,7 +139,7 @@ def test_see_profile(setup_app):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
 
     token = response.json['token']
@@ -166,7 +166,7 @@ def test_create_event(setup_app):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
     token = response.json['token']
 
@@ -204,7 +204,7 @@ def test_get_event(setup_app):
     date_event = '2020-08-11 12:30:00'
     description = "Test de creation event"
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
     token = response.json['token']
 
@@ -241,7 +241,7 @@ def test_delete_event(setup_app):
         "id_event": id
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
     token = response.json['token']
 
@@ -268,7 +268,7 @@ def test_follower_user(setup_app, gestion_user):
 
     id = user_follow.id
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
     token = response.json['token']
 
@@ -295,13 +295,13 @@ def test_accept_request_follwed(setup_app, gestion_user):
     user = User.query.filter_by(username="antoine_test").first()
     id_user1 = user.id
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                                data=payload)
     token = response.json['token']
 
     application.post('/user/follower/' + str(id_user2))
     application.get('/user/logout', headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                     data=payload2)
 
     token = response.json['token']
@@ -329,7 +329,7 @@ def test_get_follow(setup_app, gestion_user):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                     data=payload)
 
     token = response.json['token']
@@ -338,7 +338,7 @@ def test_get_follow(setup_app, gestion_user):
 
     application.get('/user/logout', headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                     data=payload2)
 
     token = response.json['token']
@@ -346,7 +346,7 @@ def test_get_follow(setup_app, gestion_user):
 
     application.get('/user/logout', headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                     data=payload)
 
     token = response.json['token']
@@ -369,7 +369,7 @@ def test_logout(setup_app):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                     data=payload)
 
     token = response.json['token']
@@ -397,7 +397,7 @@ def test_delete(setup_app):
         "password": password
     })
 
-    response = application.get('/user/login', headers={"Content-Type": "application/json"},
+    response = application.post('/user/login', headers={"Content-Type": "application/json"},
                     data=payload)
 
     token = response.json['token']
