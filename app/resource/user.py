@@ -20,10 +20,10 @@ register_definition = api.model('User Informations for Register', {
     'password': fields.String(required=True, description="User password")
 })
 
-# login_definition = api.model('User Informations for Login', {
-#     'username': fields.String(required=True, description="Username"),
-#     'password': fields.String(required=True, description="User password")
-# })
+login_definition = api.model('User Informations for Login', {
+    'username': fields.String(required=True, description="Username"),
+    'password': fields.String(required=True, description="User password")
+})
 
 evenement_definition = api.model('Evenements Informations for creation', {
     'titre': fields.String(required=True, description="Titre for new event"),
