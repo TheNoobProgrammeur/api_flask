@@ -27,13 +27,13 @@ def require_api_token(func):
                 logging.error("token invalide : " + token.split("Bearer ").pop())
                 return {"response": "ERROR : token expiret"}, 403
 
-        elif 'api_sessions_token' in session.keys():
+        if 'api_sessions_token' in session.keys():
             if not decode_auth_token(session['api_sessions_token']):
                 del session['api_sessions_token']
                 logging.error("token not found in headers and session")
                 return {"response": "ERROR : token expiret"}, 403
 
-        else:
+        if "Authorization" not in request.headers and 'api_sessions_token' not in session.keys():
             return {"response": "ERROR : token not found"}, 403
 
         return func(*args, **kwargs)

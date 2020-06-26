@@ -73,8 +73,10 @@ class Login(Resource):
         :return:
         """
 
-        username = request.args.get("username")
-        password: str = request.args.get("password")
+        data = request.get_json()
+
+        username = data.get("username")
+        password: str = data.get("password")
 
         user = User.query.filter_by(username=username).first()
 
