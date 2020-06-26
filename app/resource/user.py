@@ -20,10 +20,10 @@ register_definition = api.model('User Informations for Register', {
     'password': fields.String(required=True, description="User password")
 })
 
-login_definition = api.model('User Informations for Login', {
-    'username': fields.String(required=True, description="Username"),
-    'password': fields.String(required=True, description="User password")
-})
+# login_definition = api.model('User Informations for Login', {
+#     'username': fields.String(required=True, description="Username"),
+#     'password': fields.String(required=True, description="User password")
+# })
 
 evenement_definition = api.model('Evenements Informations for creation', {
     'titre': fields.String(required=True, description="Titre for new event"),
@@ -66,16 +66,15 @@ class Register(Resource):
 
 @ns_user.route("/login")
 class Login(Resource):
-    @api.expect(login_definition)
+    # @api.expect(login_definition)
     def get(self):
         """
         Permet a un utilisateur de s'identifier
         :return:
         """
-        data = request.get_json()
 
-        username = data.get("username")
-        password: str = data.get("password")
+        username = request.args.get("username")
+        password: str = request.args.get("password")
 
         user = User.query.filter_by(username=username).first()
 
